@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define HASH_SIZE 10000
+
+typedef struct {
+    int key;
+    int value;
+    int isUsed;  // Flag to track if the slot is used
+} HashItem;
+
+int hash(int key) {
+    return abs(key) % HASH_SIZE;
+}
+
+void insert(HashItem* hashTable, int key, int value) {
+    int index = hash(key);
+    while (hashTable[index].isUsed) {
+        index = (index + 1) % HASH_SIZE;
+    }
+    hashTable[index].key = key;
+    hashTable[index].value = value;
+    hashTable[index].isUsed = 1;
+}
+
+int find(HashItem* hashTable, int key) {
+    int index = hash(key);
+    int start = index;
+    while (hashTable[index].isUsed) {
+        if (hashTable[index].key == key) {
+            return hashTable[index].value;
+        }
+        index = (index + 1) % HASH_SIZE;
+        if (index == start) break; // Prevent infinite loop
+    }
+    return -1;
+}
+
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
+    HashItem* hashTable = calloc(HASH_SIZE, sizeof(HashItem));
+    int* result = malloc(2 * sizeof(int));
+
+    for (int i = 0; i < numsSize; i++) {
+        int complement = target - nums[i];
+        int index = find(hashTable, complement);
+        if (index != -1) {
+            result[0] = index;
+            result[1] = i;
+            *returnSize = 2;
+            free(hashTable);
+            return result;
+        }
+        insert(hashTable, nums[i], i);
+    }
+
+    *returnSize = 0;
+    free(result);
+    free(hashTable);
+    return NULL;
+}
+
+
+
+
+
+
+
+
+
+
